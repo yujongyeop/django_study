@@ -34,7 +34,7 @@
         {% for question in question_list %}
         <tr class="text-center">
             <!-- 번호 = 전체글 수 - 시작idx - 현재idx + 1 -->
-            <td>{{ question_list.paginator.count|sub:question_list.start_index|sub:forloop.counter0|add:1 }}</td>
+            <td>{{ question_list.start_index|add:forloop.counter0 }}</td>
             <!-- 추천 -->
             <td>
                 {% if question.voter.all.count > 0 %}
@@ -104,7 +104,7 @@
         {% endif %}
         <!-- 마지막 페이지-->
         <li class="page-item">
-            <a class="page-link" href="?page={{question_list.page_number}}">마지막</a>
+            <a class="page-link" href="?page={{question_list.paginator.num_pages}}">마지막</a>
         </li>
     </ul>
     <!-- 페이징처리 끝 -->
@@ -119,23 +119,23 @@
 {% endblock %}
 {% block script %}
 <script type='text/javascript'>
-$(document).ready(function(){
-    $(".page-link").on('click', function() {
-        $("#page").val($(this).data("page"));
-        $("#searchForm").submit();
-    });
+    $(document).ready(function(){
+        $(".page-link").on('click', function() {
+            $("#page").val($(this).data("page"));
+            $("#searchForm").submit();
+        });
 
-    $("#btn_search").on('click', function() {
-        $("#kw").val($(".kw").val());
-        $("#page").val(1);  // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
-        $("#searchForm").submit();
-    });
+        $("#btn_search").on('click', function() {
+            $("#kw").val($(".kw").val());
+            $("#page").val(1);  // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+            $("#searchForm").submit();
+        });
 
-    $(".so").on('change', function() {
-        $("#so").val($(this).val());
-        $("#page").val(1);
-        $("#searchForm").submit();
+        $(".so").on('change', function() {
+            $("#so").val($(this).val());
+            $("#page").val(1);
+            $("#searchForm").submit();
+        });
     });
-});
 </script>
 {% endblock %}
