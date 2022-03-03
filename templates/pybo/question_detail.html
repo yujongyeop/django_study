@@ -82,10 +82,28 @@
 
     <!-- 답변 -->
     <h5 class="border-bottom my-3 py-2">{{question.answer_set.count}}개의 답변이 있습니다.</h5>
-    {% for answer in question.answer_set.all %}
+    <!--검색창 Start-->
+    <div class="row justify-content-between my-3">
+        <div class="col-2">
+            <select class="form-control so">
+                <option value="recent" {% if so == 'recent' %}selected{% endif %}>최신순</option>
+                <option value="recommend" {% if so == 'recommend' %}selected{% endif %}>추천순</option>
+                <option value="popular" {% if so == 'popular' %}selected{% endif %}>인기순</option>
+            </select>
+        </div>
+        <div class="col-4 input-group">
+            <input type="text" class="form-control kw" value="{{kw|default_if_none:'' }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
+    <!--검색창 End-->
+    {% if answer_list %}
+    {% for answer in answer_list %}
     <a name="answer_{{answer.id}}"></a>
     <div class="row my-3">
-         <!-- 답변 추천 영역 Start-->
+        <!-- 답변 추천 영역 Start-->
         <div class="col-1">
             <div class="bg-light text-center p-3 border font-weight-bolder mb-1">{{answer.voter.count}}</div>
             <a href="#" data-uri="{% url 'pybo:vote_answer' answer.id %}" class="recommend btn btn-secondary btn-block my-1">추천</a>
@@ -149,8 +167,8 @@
             </div>
         </div>
     </div>
-
     {% endfor %}
+    {% endif %}
     <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
         {% csrf_token %}
         {% if form.errors %}
@@ -163,6 +181,52 @@
             {% endfor %}
         </div>
         {% endif %}
+        <!-- 페이징 처리 -->
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link" href="?page=1">처음</a>
+            </li>
+            <!-- 이전페이지 -->
+            {% if answer_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ answer_list.previous_page_number }}">이전</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+            </li>
+            {% endif %}
+            <!-- 페이지리스트 -->
+            {% for page_number in answer_list.paginator.page_range %}
+            {% if page_number >= answer_list.number|add:-5 and page_number <= answer_list.number|add:5 %}
+            {% if page_number == answer_list.number %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            <!-- 다음페이지 -->
+            {% if answer_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ answer_list.next_page_number }}">다음</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+            </li>
+            {% endif %}
+            <!-- 마지막 페이지-->
+            <li class="page-item">
+                <a class="page-link" href="?page={{answer_list.paginator.num_pages}}">마지막</a>
+            </li>
+        </ul>
+        <!-- 페이징처리 끝 -->
+
         <!-- 로그인 상태가 아닐 시 textarea 비활성화 -->
         <div class="form-group">
             <textarea {% if not user.is_authenticated %}disabled{% endif %} name="content" id="content" class="form-control" rows="10"></textarea>
@@ -170,6 +234,12 @@
         <input type="submit" value="답변등록" class="btn btn-primary">
     </form>
 </div>
+<form id="searchForm" method="get" action="{% url 'pybo:detail' question.id %}">
+    <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+    <input type="hidden" id="page" name="page" value="{{ page }}">
+    <input type="hidden" id="so" name="so" value="{{ so }}">
+</form>
+
 {% endblock %}
 <!-- 자바 스크립트 구문 -->
 
@@ -186,6 +256,22 @@
             if(confirm  ("정말로 추천하시겠습니까?")) {
                 location.href = $(this).data('uri');
             }
+        });
+        $(".page-link").on('click', function() {
+            $("#page").val($(this).data("page"));
+            $("#searchForm").submit();
+        });
+
+        $("#btn_search").on('click', function() {
+            $("#kw").val($(".kw").val());
+            $("#page").val(1);  // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+            $("#searchForm").submit();
+        });
+
+        $(".so").on('change', function() {
+            $("#so").val($(this).val());
+            $("#page").val(1);
+            $("#searchForm").submit();
         });
     });
 </script>
