@@ -52,10 +52,9 @@ def detail(request, question_id):
 
     if kw:
         answer_list = answer_list.filter(
-            Q(subject__icontains=kw) |  # 제목검색
-            Q(content__icontains=kw) |  # 내용검색
-            Q(author__username__icontains=kw) |  # 질문 글쓴이 검색
-            Q(answer__author__username__icontains=kw)  # 답변 글쓴이 검색
+            Q(content__icontains=kw) |  # 내용 검색
+            Q(comment__author__username__icontains=kw) |  # 댓글 글쓴이 검색
+            Q(author__username__icontains=kw)  # 질문 글쓴이 검색
         ).distinct()
     paginator = Paginator(answer_list, 5)
     page_obj = paginator.get_page(page)
