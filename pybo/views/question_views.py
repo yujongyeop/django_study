@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from ..models import Question
 from ..forms import QuestionForm
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
@@ -23,6 +25,32 @@ def question_create(request):
         form = QuestionForm()
     context = {'form': form}
     return render(request, 'pybo/question_form.html', context)
+
+
+def question_list(request, category_name):
+    """
+    카테고리
+    """
+    page = request.GET.get('page', '1')
+    kw = request.GET.get('kw', '')
+    so = request.GET.get('so', 'recent')
+
+    _question_list = Question.objects.filter()
+
+    if kw:
+        _question_list = _question_list.filter(
+            Q(subject__icontains=kw) |  # 제목검색
+            Q(content__icontains=kw) |  # 내용검색
+            Q(author__username__icontains=kw) |  # 질문 글쓴이검색
+            Q(answer__content__icontains=kw) |  # 답변내용검색
+            Q(answer__author__username__icontains=kw)  # 답글 글쓴이검색
+        ).distinct()
+    _question_list = _question_list.order_by('-create_date')
+    paginator = Paginator(_question_list, 25)
+    page_obj = paginator.get_page(page)
+
+    context = {'question_list': page_obj, 'page': page, 'so': so, 'kw': kw}
+    return render(request, 'pybo/question_list.html', context)
 
 
 @login_required(login_url='common:login')
