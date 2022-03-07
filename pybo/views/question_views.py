@@ -27,7 +27,7 @@ def question_create(request):
     return render(request, 'pybo/question_form.html', context)
 
 
-def question_list(request, category_name):
+def category_list(request, category_name):
     """
     카테고리
     """
@@ -35,7 +35,7 @@ def question_list(request, category_name):
     kw = request.GET.get('kw', '')
     so = request.GET.get('so', 'recent')
 
-    _question_list = Question.objects.filter()
+    _question_list = Question.objects.filter(category__icontains=category_name)
 
     if kw:
         _question_list = _question_list.filter(
@@ -49,7 +49,7 @@ def question_list(request, category_name):
     paginator = Paginator(_question_list, 25)
     page_obj = paginator.get_page(page)
 
-    context = {'question_list': page_obj, 'page': page, 'so': so, 'kw': kw}
+    context = {'question_list': page_obj, 'page': page, 'so': so, 'kw': kw, 'category': category_name}
     return render(request, 'pybo/question_list.html', context)
 
 

@@ -1,8 +1,8 @@
 <nav id="sidebar" class="border-top border-secondary">
     <div class="list-group">
         <a class="rounded-0 list-group-item list-group-item-action list-group-item-light" href="{% url 'pybo:index' %}">전체글</a>
-        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light" href="{% url 'pybo:question_list' 'QnA' %}">질문과답변</a>
-        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light" href="{% url 'pybo:index' %}">자유게시판</a>
-        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light" href="#">버그및건의</a>
+        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light" href="{% url 'pybo:category_list' 'QnA' %}">질문과답변</a>
+        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light" href="{% url 'pybo:category_list' 'free' %}">자유게시판</a>
+        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light" href="{% url 'pybo:category_list' 'BnS' %}">버그및건의</a>
     </div>
 </nav>
