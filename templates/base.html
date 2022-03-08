@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
     <!-- pybo CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
-    <title>Hello, pybo!</title>
+    <title></title>
 </head>
 <body>
 
@@ -21,7 +21,7 @@
             {% include "sidebar.html" %}
         </div>
         <div class="col-sm-12 col-md-9 col-lg-10 p-2">
-            <div id="content" class="border-top border-secondary">
+            <div id="content" class="border-secondary">
                 <div class="content_block">
                     <!-- 기본 템플릿 안에 삽입될 내용 Start -->
                     {% block content %}
